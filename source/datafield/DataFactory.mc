@@ -211,7 +211,7 @@ class WindField extends BaseDataField {
 			}
 			return directLabel + " " + speed.format("%0.0f") + unit;
 		}
-		return "WIND ?";
+		return "WIND -";
 	}
 }
 
@@ -562,7 +562,7 @@ class TemparatureHLField extends BaseDataField {
 				return Lang.format("H $1$° - L $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
 			}
 		}
-		return "H ? - L ?";
+		return "H - L -";
 	}
 }
 
@@ -596,7 +596,7 @@ class TemparatureOutField extends BaseDataField {
 				return Lang.format("TEMP $1$",[value]);
 			}
 		}
-		return "TEMP ?";
+		return "TEMP -";
 	}
 }
 
@@ -1840,7 +1840,7 @@ class PrecipitationsField extends BaseDataField {
 	
 	function cur_label(value) {
 		if (value<=0) {
-			return "RAIN ?";
+			return "RAIN -";
 		}
 		return Lang.format("RAIN $1$%",[value.format("%i")]);
 	}
