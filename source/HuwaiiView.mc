@@ -100,7 +100,7 @@ class HuwaiiView extends WatchUi.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
-    	
+    	//ystem.println("onUpdate");
     	var clockTime = System.getClockTime();
     	var current_tick = System.getTimer();
 
@@ -145,43 +145,6 @@ class HuwaiiView extends WatchUi.WatchFace {
     	
 //    	System.println("update");
 //    	System.println("" + clockTime.min + ":" + clockTime.sec);
-    	
-    	// Calculate battery consumtion in days
-    	var time_now = Time.now();
-    	if (last_battery_hour == null) {
-    		last_battery_hour = time_now;
-    		last_battery_percent = System.getSystemStats().battery;
-    		last_hour_consumtion = -1;
-    	} else if (time_now.compare(last_battery_hour) >= 60*60) { // 60 min
-    		last_battery_hour = time_now;
-    		var current_battery = System.getSystemStats().battery;
-    		last_hour_consumtion = last_battery_percent-current_battery;
-    		if (last_hour_consumtion < 0) {
-    			last_hour_consumtion = -1;
-    		}
-			if (last_hour_consumtion>0) {
-    			App.getApp().setProperty("last_hour_consumtion", last_hour_consumtion);
-    			
-				var consumtion_history = App.getApp().getProperty("consumtion_history");
-				if (consumtion_history == null) {
-					App.getApp().setProperty("consumtion_history", [last_hour_consumtion]);
-				} else {
-//					System.println(consumtion_history);
-//					System.println(last_hour_consumtion);
-					consumtion_history.add(last_hour_consumtion);
-					if (consumtion_history.size() > 24) {
-						var object0 = consumtion_history[0];
-						consumtion_history.remove(object0);
-					}
-					App.getApp().setProperty("consumtion_history", consumtion_history);
-				}
-//				System.println("consumtion_history_set");
-//				System.println(App.getApp().getProperty("consumtion_history"));
-    		}
-    		last_battery_percent = current_battery;
-    	} else {
-    		//System.println(time_now.compare(last_battery_hour));
-    	}
         
         // if this device has the clear dc bug
         // use a screen buffer to save having to redraw
@@ -338,6 +301,7 @@ class HuwaiiView extends WatchUi.WatchFace {
 	}
 
 	function onPartialUpdate(dc) {
+		//System.println("onPartialUpdate");
 		if (!((Application.getApp().getProperty("use_analog")))) {
 			if (Application.getApp().getProperty("always_on_second")) {
 				var clockTime = System.getClockTime(); 

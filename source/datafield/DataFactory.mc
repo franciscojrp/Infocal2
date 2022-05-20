@@ -2,12 +2,6 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 using Toybox.Application as App;
-using Toybox.Activity as Activity;
-using Toybox.ActivityMonitor as ActivityMonitor;
-using Toybox.SensorHistory as SensorHistory;
-
-using Toybox.UserProfile;
-using Toybox.Time;
 using Toybox.Time.Gregorian as Date;
 
 enum /* FIELD_TYPES */ {
@@ -43,7 +37,8 @@ enum /* FIELD_TYPES */ {
 	
 	FIELD_TYPE_AMPM_INDICATOR = 26,
 	FIELD_TYPE_CTEXT_INDICATOR,
-	FIELD_TYPE_WIND
+	FIELD_TYPE_WIND,
+	FIELD_TYPE_RECOVERY
 }
 
 function buildFieldObject(type) {
@@ -105,6 +100,8 @@ function buildFieldObject(type) {
 		return new CTextField(FIELD_TYPE_CTEXT_INDICATOR);
 	} else if (type==FIELD_TYPE_WIND) {
 		return new WindField(FIELD_TYPE_WIND);
+	} else if (type==FIELD_TYPE_RECOVERY) {
+		return new RecoveryField(FIELD_TYPE_RECOVERY);
 	}
 	
 	return new EmptyDataField(FIELD_TYPE_EMPTY);
@@ -192,25 +189,21 @@ class WindField extends BaseDataField {
 	function cur_label(value) {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
-        var weather_data = App.getApp().getProperty("OpenWeatherMapCurrent");
-        if (weather_data != null) {
-        	var settings = Sys.getDeviceSettings();
-			var speed = weather_data["wind_speed"]*3.6; // kph
-			var direct = weather_data["wind_direct"];
-			
-			var direct_corrected = direct + 11.25;                                 					// move degrees to int spaces (North from 348.75-11.25 to 360(min)-22.5(max))
-			direct_corrected = direct_corrected < 360 ? direct_corrected : direct_corrected - 360;  // move North from 360-371.25 back to 0-11.25 (final result is North 0(min)-22.5(max))
-			var direct_idx = (direct_corrected / 22.5).toNumber();                         			// now calculate direction array position: int([0-359.99]/22.5) will result in 0-15 (correct array positions)
-			
-			var directLabel = wind_direction_mapper[direct_idx];
-			var unit = "k";
-			if (settings.distanceUnits == System.UNIT_STATUTE) {	
-				speed *= 0.621371;
-				unit = "m";				
-			}
-			return directLabel + " " + speed.format("%0.1f") + unit;
-        }
-        return "--";
+		var settings = Sys.getDeviceSettings();
+		var speed = Weather.getCurrentConditions().windSpeed;
+		var direct = Weather.getCurrentConditions().windBearing;
+		
+		var direct_corrected = direct + 11.25;                                 					// move degrees to int spaces (North from 348.75-11.25 to 360(min)-22.5(max))
+		direct_corrected = direct_corrected < 360 ? direct_corrected : direct_corrected - 360;  // move North from 360-371.25 back to 0-11.25 (final result is North 0(min)-22.5(max))
+		var direct_idx = (direct_corrected / 22.5).toNumber();                         			// now calculate direction array position: int([0-359.99]/22.5) will result in 0-15 (correct array positions)
+		
+		var directLabel = wind_direction_mapper[direct_idx];
+		var unit = "k";
+		if (settings.distanceUnits == System.UNIT_STATUTE) {	
+			speed *= 0.621371;
+			unit = "m";		
+		}
+		return directLabel + " " + speed.format("%0.1f") + unit;
 	}
 }
 
@@ -245,56 +238,273 @@ class WeatherField extends BaseDataField {
 		BaseDataField.initialize(id);
 		
 		weather_icon_mapper = {
-    		"01d" => "",
-			"02d" => "",
-			"03d" => "",
-			"04d" => "",
-			"09d" => "",
-			"10d" => "",
-			"11d" => "",
-			"13d" => "",
-			"50d" => "",
+    		"01d" => "", //sunny
+			"02d" => "", //few clouds
+			"03d" => "", //scattered clouds
+			"04d" => "", //broken clouds
+			"09d" => "", //shower rain
+			"10d" => "", //rain
+			"11d" => "", //thunderstorm
+			"13d" => "", //snow
+			"50d" => "", //mist
 			
-			"01n" => "",
-			"02n" => "",
-			"03n" => "",
-			"04n" => "",
-			"09n" => "",
-			"10n" => "",
-			"11n" => "",
-			"13n" => "",
-			"50n" => "",
+			"01n" => "", //sunny
+			"02n" => "", //few clouds
+			"03n" => "", //scattered clouds
+			"04n" => "", //broken clouds
+			"09n" => "", //shower rain
+			"10n" => "", //rain
+			"11n" => "", //thunderstorm
+			"13n" => "", //snow
+			"50n" => "", //mist
 		};
 	}
 	
 	function cur_icon() {
-		var weather_data = App.getApp().getProperty("OpenWeatherMapCurrent");
-		if (weather_data != null) {
-			return weather_icon_mapper[weather_data["icon"]];
+		var condition = Weather.getCurrentConditions().condition;
+		if (condition == Weather.CONDITION_CLEAR) {
+			return "";
+		} else if (condition == Weather.CONDITION_PARTLY_CLOUDY) {
+			return "";
+		} else if (condition == Weather.CONDITION_MOSTLY_CLOUDY) {
+			return "";
+		} else if (condition == Weather.CONDITION_THIN_CLOUDS) {
+			return "";
+		} else if (condition == Weather.CONDITION_RAIN) {
+			return "";
+		} else if (condition == Weather.CONDITION_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_WINDY) {
+			return "";//TODO
+		} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
+			return "";
+		} else if (condition == Weather.CONDITION_WINTRY_MIX) {
+			return "";//TODO
+		} else if (condition == Weather.CONDITION_FOG) {
+			return "";
+		} else if (condition == Weather.CONDITION_HAZY) {
+			return "";
+		} else if (condition == Weather.CONDITION_HAIL) { //Granizo
+			return "";
+		} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
+			return "";
+		} else if (condition == Weather.CONDITION_SCATTERED_THUNDERSTORMS) {
+			return "";
+		} else if (condition == Weather.CONDITION_UNKNOWN_PRECIPITATION) {
+			return "";
+		} else if (condition == Weather.CONDITION_LIGHT_RAIN) {
+			return "";
+		} else if (condition == Weather.CONDITION_HEAVY_RAIN) {
+			return "";
+		} else if (condition == Weather.CONDITION_LIGHT_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_CLOUDY) {
+			return "";
+		} else if (condition == Weather.CONDITION_RAIN_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
+			return "";
+		} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
+			return "";
+		} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
+			return "";
+		} else if (condition == Weather.CONDITION_SHOWERS) {
+			return "";
+		} else if (condition == Weather.CONDITION_HEAVY_SHOWERS) {
+			return "";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_SHOWERS) {
+			return "";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_THUNDERSTORMS) {
+			return "";
+		} else if (condition == Weather.CONDITION_MIST) {
+			return "";
+		} else if (condition == Weather.CONDITION_FAIR) {
+			return "";
+		} else if (condition == Weather.CONDITION_HURRICANE) {
+			return "";//TODO
+		} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
+			return "";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
+			return "";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
+			return "";
+			
+		} else if (condition == Weather.CONDITION_DUST) {
+			return "";
+		} else if (condition == Weather.CONDITION_DRIZZLE) {
+			return "";
+		} else if (condition == Weather.CONDITION_TORNADO) {
+			return "";
+		} else if (condition == Weather.CONDITION_SMOKE) {
+			return "";
+		} else if (condition == Weather.CONDITION_ICE) {
+			return "";
+		} else if (condition == Weather.CONDITION_SAND) {
+			return "";
+		} else if (condition == Weather.CONDITION_SQUALL) {
+			return "";
+		} else if (condition == Weather.CONDITION_SANDSTORM) {
+			return "";
+		} else if (condition == Weather.CONDITION_VOLCANIC_ASH) {
+			return "";
+		} else if (condition == Weather.CONDITION_HAZE) {
+			return "";
+		} else if (condition == Weather.CONDITION_FLURRIES) {
+			return "";
+		} else if (condition == Weather.CONDITION_FREEZING_RAIN) {
+			return "";
+		} else if (condition == Weather.CONDITION_SLEET) {
+			return "";
+		} else if (condition == Weather.CONDITION_ICE_SNOW) {
+			return "";
+		} else if (condition == Weather.CONDITION_UNKNOWN) {
+			return "";
 		}
-		return null;
+		return "";
 	}
 	
 	function cur_label(value) {
 		// WEATHER
-		var need_minimal = App.getApp().getProperty("minimal_data");
-        var weather_data = App.getApp().getProperty("OpenWeatherMapCurrent");
-        if (weather_data != null) {
-        	var settings = Sys.getDeviceSettings();
-			var temp = weather_data["temp"];
-        	var unit = "°C";
-        	if (settings.temperatureUnits == System.UNIT_STATUTE) {
-				temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-				unit = "°F";
-			}
-			value = temp.format("%d") + unit;
-        
-	        var description = weather_data.get("des");
-	        if (description != null) {
-	        	return description + " " +  value;
-	        }
-        }
-        return "--";
+		// var need_minimal = App.getApp().getProperty("minimal_data");
+
+		// var settings = Sys.getDeviceSettings();
+		// var temp = Weather.getCurrentConditions().feelsLikeTemperature;
+		// var unit = "°C";
+		// if (settings.temperatureUnits == System.UNIT_STATUTE) {
+		// 	temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+		// 	unit = "°F";
+		// }
+		// value = temp.format("%d") + unit;
+	
+		var description = get_weather_desc(Weather.getCurrentConditions().condition);
+		if (description != null) {
+			return description;// + " " +  value;
+		}
+	}
+
+	function get_weather_desc(condition) {
+		if (condition == Weather.CONDITION_CLEAR) {
+			return "Clear";
+		} else if (condition == Weather.CONDITION_PARTLY_CLOUDY) {
+			return "Part. Cloudy";
+		} else if (condition == Weather.CONDITION_MOSTLY_CLOUDY) {
+			return "Most. Cloudy";
+		} else if (condition == Weather.CONDITION_THIN_CLOUDS) {
+			return "Thin Clouds";
+		} else if (condition == Weather.CONDITION_RAIN) {
+			return "Rain";
+		} else if (condition == Weather.CONDITION_SNOW) {
+			return "Snow";
+		} else if (condition == Weather.CONDITION_WINDY) {
+			return "Windy";
+		} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
+			return "Thunderst.";
+		} else if (condition == Weather.CONDITION_WINTRY_MIX) {
+			return "Rain/Snow";
+		} else if (condition == Weather.CONDITION_FOG) {
+			return "Fog";
+		} else if (condition == Weather.CONDITION_HAZY) {
+			return "Hazy";
+		} else if (condition == Weather.CONDITION_HAIL) { //Granizo
+			return "Hail";
+		} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
+			return "Showers";
+		} else if (condition == Weather.CONDITION_SCATTERED_THUNDERSTORMS) {
+			return "Thunderst.";
+		} else if (condition == Weather.CONDITION_UNKNOWN_PRECIPITATION) {
+			return "Precipit.";
+		} else if (condition == Weather.CONDITION_LIGHT_RAIN) {
+			return "Light Rain";
+		} else if (condition == Weather.CONDITION_HEAVY_RAIN) {
+			return "Heavy Rain";
+		} else if (condition == Weather.CONDITION_LIGHT_SNOW) {
+			return "Light Snow";
+		} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
+			return "Heavy Snow";
+		} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
+			return "Rain/Snow";
+		} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
+			return "Rain/Snow";
+		} else if (condition == Weather.CONDITION_CLOUDY) {
+			return "Cloudy";
+		} else if (condition == Weather.CONDITION_RAIN_SNOW) {
+			return "Rain/Snow";
+		} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
+			return "Part Clear";
+		} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
+			return "Most Clear";
+		} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
+			return "Showers";
+		} else if (condition == Weather.CONDITION_SHOWERS) {
+			return "Showers";
+		} else if (condition == Weather.CONDITION_HEAVY_SHOWERS) {
+			return "Showers";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_SHOWERS) {
+			return "Showers";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_THUNDERSTORMS) {
+			return "Thunderst.";
+		} else if (condition == Weather.CONDITION_MIST) {
+			return "Mist";
+		} else if (condition == Weather.CONDITION_FAIR) {
+			return "Fair";
+		} else if (condition == Weather.CONDITION_HURRICANE) {
+			return "Hurricane";
+		} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
+			return "Tr. Storm";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
+			return "Snow";
+		} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
+			return "RainSnow";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
+			return "Cloud/Rain";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
+			return "Cloud/Snow";
+		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
+			return "Cloud/Snow";
+		} else if (condition == Weather.CONDITION_DUST) {
+			return "Dust";
+		} else if (condition == Weather.CONDITION_DRIZZLE) {
+			return "Drizzle";
+		} else if (condition == Weather.CONDITION_TORNADO) {
+			return "Tornado";
+		} else if (condition == Weather.CONDITION_SMOKE) {
+			return "Smoke";
+		} else if (condition == Weather.CONDITION_ICE) {
+			return "Ice";
+		} else if (condition == Weather.CONDITION_SAND) {
+			return "Sand";
+		} else if (condition == Weather.CONDITION_SQUALL) {
+			return "Squall";
+		} else if (condition == Weather.CONDITION_SANDSTORM) {
+			return "Sandstorm";
+		} else if (condition == Weather.CONDITION_VOLCANIC_ASH) {
+			return "Volc. Ash";
+		} else if (condition == Weather.CONDITION_HAZE) {
+			return "Haze";
+		} else if (condition == Weather.CONDITION_FLURRIES) {
+			return "Flurries";
+		} else if (condition == Weather.CONDITION_FREEZING_RAIN) {
+			return "Freez. Rain";
+		} else if (condition == Weather.CONDITION_SLEET) {
+			return "Sleet";
+		} else if (condition == Weather.CONDITION_ICE_SNOW) {
+			return "Ice Snow";
+		} else if (condition == Weather.CONDITION_UNKNOWN) {
+			return "Unknown";
+		}
+		return "Unknown";
 	}
 }
 
@@ -332,29 +542,20 @@ class TemparatureHLField extends BaseDataField {
 	function cur_label(value) {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
-        var weather_data = App.getApp().getProperty("OpenWeatherMapCurrent");
-        if (weather_data != null) {
-			var settings = Sys.getDeviceSettings();
-			var temp_min = weather_data["temp_min"];
-			var temp_max = weather_data["temp_max"];
-        	var unit = "°C";
-        	if (settings.temperatureUnits == System.UNIT_STATUTE) {
-				temp_min = (temp_min * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-				temp_max = (temp_max * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-				unit = "°F";
-			}
-			if (need_minimal) {
-				return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
-			} else {
-				return Lang.format("H $1$ L $2$",[temp_max.format("%d"), temp_min.format("%d")]);
-			}
-        } else {
-        	if (need_minimal) {
-				return "--";
-			} else {
-				return "H - L -";
-			}
-        }
+		var settings = Sys.getDeviceSettings();
+		var temp_min = Weather.getCurrentConditions().lowTemperature;
+		var temp_max = Weather.getCurrentConditions().highTemperature;
+		var unit = "°C";
+		if (settings.temperatureUnits == System.UNIT_STATUTE) {
+			temp_min = (temp_min * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+			temp_max = (temp_max * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+			unit = "°F";
+		}
+		if (need_minimal) {
+			return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
+		} else {
+			return Lang.format("H $1$° - L $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
+		}
 	}
 }
 
@@ -371,30 +572,20 @@ class TemparatureOutField extends BaseDataField {
 	function cur_label(value) {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
-        var weather_data = App.getApp().getProperty("OpenWeatherMapCurrent");
-        if (weather_data != null) {
-			var settings = Sys.getDeviceSettings();
-			var temp = weather_data["temp"];
-        	var unit = "°C";
-        	if (settings.temperatureUnits == System.UNIT_STATUTE) {
-				temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-				unit = "°F";
-			}
-			value = temp.format("%d") + unit;
-			
-			
-			if (need_minimal) {
-				return value;
-			} else {
-				return Lang.format("TEMP $1$",[value]);
-			}
-        } else {
-        	if (need_minimal) {
-				return "--";
-			} else {
-				return "TEMP --";
-			}
-        }
+		var settings = Sys.getDeviceSettings();
+		var temp = Weather.getCurrentConditions().temperature;
+		var unit = "°C";
+		if (settings.temperatureUnits == System.UNIT_STATUTE) {
+			temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+			unit = "°F";
+		}
+		value = temp.format("%d") + unit;
+		
+		if (need_minimal) {
+			return value;
+		} else {
+			return Lang.format("TEMP $1$",[value]);
+		}
 	}
 }
 
@@ -789,7 +980,7 @@ class GroupNotiField extends BaseDataField {
 	
 	function cur_label(value) {
 		var settings = Sys.getDeviceSettings();
-		var value = settings.alarmCount;
+		value = settings.alarmCount;
 		var alarm_str = Lang.format("A$1$",[value.format("%d")]);
 		value = settings.notificationCount;
 		var noti_str = Lang.format("N$1$",[value.format("%d")]);
@@ -865,37 +1056,71 @@ class SunField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
-		if (gLocationLat != null) {
-			var value = "";
+		var location = Position.getInfo();
+		if (location has :position && location.position != null && location.accuracy != Position.QUALITY_NOT_AVAILABLE) {
+			//Sys.println("Saving location with accuracy " + location.accuracy);
+			var loc = location.position.toDegrees(); // Array of Doubles.
+			//Sys.println("location: " + loc);
+			gLocationLat = loc[0].toFloat();
+			gLocationLng = loc[1].toFloat();
+
+			Application.getApp().setProperty("LastLocationLat", gLocationLat);
+			Application.getApp().setProperty("LastLocationLng", gLocationLng);
+		} else {
+			var lat = Application.getApp().getProperty("LastLocationLat");
+			if (lat != null) {
+				gLocationLat = lat;
+			}
+
+			var lng = Application.getApp().getProperty("LastLocationLng");
+			if (lng != null) {
+				gLocationLng = lng;
+			}
+
+			if (lat != null && lng != null) {
+				//Sys.println("Using last location: " + gLocationLat + "," + gLocationLng);
+				location = new Position.Location(
+				{
+					:latitude => gLocationLat,
+					:longitude => gLocationLng,
+					:format => :degrees
+				});
+			} else {
+				Sys.println("No location available");
+				location = null;
+			}
+		}
+
+		if (location != null) {
+			value = "";
 			var nextSunEvent = 0;
 			var isSunriseNext = false;
-			var now = Date.info(Time.now(), Time.FORMAT_SHORT);
-	
-			// Convert to same format as sunTimes, for easier comparison. Add a minute, so that e.g. if sun rises at
-			// 07:38:17, then 07:38 is already consided daytime (seconds not shown to user).
-			now = now.hour + ((now.min) / 60.0);
-			
-			// Get today's sunrise/sunset times in current time zone.
-			var sunTimes = getSunTimes(gLocationLat, gLocationLng, null, /* tomorrow */ false);
-			//Sys.println(sunTimes);
+			var now = Time.now();
+			//Sys.println("location: " + location.position.toGeoString(Position.GEO_DM));
+			var sunrise = Weather.getSunrise(location.position, now);
+			//Sys.println("sunrise: " + sunrise);
+
+			var sunset = Weather.getSunset(location.position, now);
+			//Sys.println("sunset: " + sunset);
 	
 			// If sunrise/sunset happens today.
-			var sunriseSunsetToday = ((sunTimes[0] != null) && (sunTimes[1] != null));
+			var sunriseSunsetToday = ((sunrise != null) && (sunset != null));
+			//Sys.println("sunriseSunsetToday: " + sunriseSunsetToday);
+
 			if (sunriseSunsetToday) {
 	
 				// Before sunrise today: today's sunrise is next.
-				if (now < sunTimes[0]) {
-					nextSunEvent = sunTimes[0];
+				if (now.lessThan(sunrise)) {
+					nextSunEvent = sunrise;
 					isSunriseNext = true;
 	
 				// After sunrise today, before sunset today: today's sunset is next.
-				} else if (now < sunTimes[1]) {
-					nextSunEvent = sunTimes[1];
+				} else if (now.lessThan(sunset)) {
+					nextSunEvent = sunset;
 	
 				// After sunset today: tomorrow's sunrise (if any) is next.
 				} else {
-					sunTimes = getSunTimes(gLocationLat, gLocationLng, null, /* tomorrow */ true);
-					nextSunEvent = sunTimes[0];
+					nextSunEvent = Weather.getSunrise(location.position, Time.today().add(new Time.Duration(86401)));
 					isSunriseNext = true;
 				}
 			}
@@ -903,15 +1128,16 @@ class SunField extends BaseDataField {
 			// Sun never rises/sets today.
 			if (!sunriseSunsetToday) {
 				// Sun never rises: sunrise is next, but more than a day from now.
-				if (sunTimes[0] == null) {
+				if (sunset == null) {
 					isSunriseNext = true;
 				}
 				return "SUN --";
 			// We have a sunrise/sunset time.
 			} else {
 				var need_minimal = App.getApp().getProperty("minimal_data");
-				var hour = Math.floor(nextSunEvent).toLong() % 24;
-				var min = Math.floor((nextSunEvent - Math.floor(nextSunEvent)) * 60); // Math.floor(fractional_part * 60)
+				var time = Date.info(nextSunEvent, Time.FORMAT_MEDIUM);
+				var hour = time.hour;
+				var min = time.min;
 				var ftime = getFormattedTime(hour, min);
 //				var timestr = ftime[:hour] + ":" + ftime[:min] + ftime[:amPm]; 
 				var timestr = ftime[:hour] + ":" + ftime[:min]; 
@@ -925,121 +1151,8 @@ class SunField extends BaseDataField {
 	
 		// Waiting for location.
 		} else {
-			return "SUN --";
+			return "NO LOC.";
 		}
-	}
-	
-	/**
-	* With thanks to ruiokada. Adapted, then translated to Monkey C, from:
-	* https://gist.github.com/ruiokada/b28076d4911820ddcbbc
-	*
-	* Calculates sunrise and sunset in local time given latitude, longitude, and tz.
-	*
-	* Equations taken from:
-	* https://en.wikipedia.org/wiki/Julian_day#Converting_Julian_or_Gregorian_calendar_date_to_Julian_Day_Number
-	* https://en.wikipedia.org/wiki/Sunrise_equation#Complete_calculation_on_Earth
-	*
-	* @method getSunTimes
-	* @param {Float} lat Latitude of location (South is negative)
-	* @param {Float} lng Longitude of location (West is negative)
-	* @param {Integer || null} tz Timezone hour offset. e.g. Pacific/Los Angeles is -8 (Specify null for system timezone)
-	* @param {Boolean} tomorrow Calculate tomorrow's sunrise and sunset, instead of today's.
-	* @return {Array} Returns array of length 2 with sunrise and sunset as floats.
-	*                 Returns array with [null, -1] if the sun never rises, and [-1, null] if the sun never sets.
-	*/
-	function getSunTimes(lat, lng, tz, tomorrow) {
-
-		// Use double precision where possible, as floating point errors can affect result by minutes.
-		lat = lat.toDouble();
-		lng = lng.toDouble();
-
-		var now = Time.now();
-		if (tomorrow) {
-			now = now.add(new Time.Duration(24 * 60 * 60));
-		}
-		var d = Date.info(Time.now(), Time.FORMAT_SHORT);
-		var rad = Math.PI / 180.0d;
-		var deg = 180.0d / Math.PI;
-		
-		// Calculate Julian date from Gregorian.
-		var a = Math.floor((14 - d.month) / 12);
-		var y = d.year + 4800 - a;
-		var m = d.month + (12 * a) - 3;
-		var jDate = d.day
-			+ Math.floor(((153 * m) + 2) / 5)
-			+ (365 * y)
-			+ Math.floor(y / 4)
-			- Math.floor(y / 100)
-			+ Math.floor(y / 400)
-			- 32045;
-
-		// Number of days since Jan 1st, 2000 12:00.
-		var n = jDate - 2451545.0d + 0.0008d;
-		//Sys.println("n " + n);
-
-		// Mean solar noon.
-		var jStar = n - (lng / 360.0d);
-		//Sys.println("jStar " + jStar);
-
-		// Solar mean anomaly.
-		var M = 357.5291d + (0.98560028d * jStar);
-		var MFloor = Math.floor(M);
-		var MFrac = M - MFloor;
-		M = MFloor.toLong() % 360;
-		M += MFrac;
-		//Sys.println("M " + M);
-
-		// Equation of the centre.
-		var C = 1.9148d * Math.sin(M * rad)
-			+ 0.02d * Math.sin(2 * M * rad)
-			+ 0.0003d * Math.sin(3 * M * rad);
-		//Sys.println("C " + C);
-
-		// Ecliptic longitude.
-		var lambda = (M + C + 180 + 102.9372d);
-		var lambdaFloor = Math.floor(lambda);
-		var lambdaFrac = lambda - lambdaFloor;
-		lambda = lambdaFloor.toLong() % 360;
-		lambda += lambdaFrac;
-		//Sys.println("lambda " + lambda);
-
-		// Solar transit.
-		var jTransit = 2451545.5d + jStar
-			+ 0.0053d * Math.sin(M * rad)
-			- 0.0069d * Math.sin(2 * lambda * rad);
-		//Sys.println("jTransit " + jTransit);
-
-		// Declination of the sun.
-		var delta = Math.asin(Math.sin(lambda * rad) * Math.sin(23.44d * rad));
-		//Sys.println("delta " + delta);
-
-		// Hour angle.
-		var cosOmega = (Math.sin(-0.83d * rad) - Math.sin(lat * rad) * Math.sin(delta))
-			/ (Math.cos(lat * rad) * Math.cos(delta));
-		//Sys.println("cosOmega " + cosOmega);
-
-		// Sun never rises.
-		if (cosOmega > 1) {
-			return [null, -1];
-		}
-		
-		// Sun never sets.
-		if (cosOmega < -1) {
-			return [-1, null];
-		}
-		
-		// Calculate times from omega.
-		var omega = Math.acos(cosOmega) * deg;
-		var jSet = jTransit + (omega / 360.0);
-		var jRise = jTransit - (omega / 360.0);
-		var deltaJSet = jSet - jDate;
-		var deltaJRise = jRise - jDate;
-
-		var tzOffset = (tz == null) ? (Sys.getClockTime().timeZoneOffset / 3600) : tz;
-		return [
-			/* localRise */ (deltaJRise * 24) + tzOffset,
-			/* localSet */ (deltaJSet * 24) + tzOffset
-		];
 	}
 	
 	// Return a formatted time dictionary that respects is24Hour and HideHoursLeadingZero settings.
@@ -1097,7 +1210,7 @@ class TemparatureField extends BaseDataField {
 	
 	function cur_label(value) {
 		var need_minimal = App.getApp().getProperty("minimal_data");
-		var value = 0;
+		value = 0;
 		var settings = Sys.getDeviceSettings();
 		if ((Toybox has :SensorHistory) && (Toybox.SensorHistory has :getTemperatureHistory)) {
 			var sample = SensorHistory.getTemperatureHistory(null).next();
@@ -1145,7 +1258,7 @@ class AltitudeField extends BaseDataField {
 	
 	function cur_label(value) {
 		var need_minimal = App.getApp().getProperty("minimal_data");
-		var value = 0;
+		value = 0;
 		// #67 Try to retrieve altitude from current activity, before falling back on elevation history.
 		// Note that Activity::Info.altitude is supported by CIQ 1.x, but elevation history only on select CIQ 2.x
 		// devices.
@@ -1207,7 +1320,7 @@ class AlarmField extends BaseDataField {
 	
 	function cur_label(value) {
 		var settings = Sys.getDeviceSettings();
-		var value = settings.alarmCount;
+		value = settings.alarmCount;
 		return Lang.format("ALAR $1$",[value.format("%d")]);
 	}
 }
@@ -1228,7 +1341,7 @@ class NotifyField extends BaseDataField {
 	
 	function cur_label(value) {
 		var settings = Sys.getDeviceSettings();
-		var value = settings.notificationCount;
+		value = settings.notificationCount;
 		return Lang.format("NOTIF $1$",[value.format("%d")]);
 	}
 }
@@ -1318,7 +1431,7 @@ class ActiveField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
-		return Lang.format("ACT $1$",[value.format("%d")]);
+		return Lang.format("ACT $1$m",[value.format("%d")]);
 	}
 	
 	function bar_data() {
@@ -1351,7 +1464,7 @@ class DistanceField extends BaseDataField {
 	}
 	
 	function max_label(value) {
-		var value = value/1000.0;
+		value = value/1000.0;
 		value = value/100.0; // convert cm to km
     	var valKp = App.getApp().toKValue(value);
     	return Lang.format("$1$K",[valKp]);
@@ -1576,39 +1689,11 @@ class BatteryField extends BaseDataField {
 	
 	function cur_label(value) {
 		var battery_format = App.getApp().getProperty("battery_format");
-		var hour_consumtion = last_hour_consumtion;
-		if (hour_consumtion <= 0) {
-			var consumtion_history = App.getApp().getProperty("consumtion_history");
-			if (consumtion_history != null) {
-				var total = 0.0;
-				for( var i = 0; i < consumtion_history.size(); i++ ) {
-				    // Code to do in a loop
-				    total += consumtion_history[i];
-				}
-				hour_consumtion = total/consumtion_history.size();
-//				System.println("hour_consumtion");
-//				System.println(hour_consumtion);
-			} else {
-				var hour_consumtion_saved = App.getApp().getProperty("last_hour_consumtion");
-				if (hour_consumtion_saved != null) {
-					hour_consumtion = hour_consumtion_saved;
-				}
-			}
-		}
-		hour_consumtion = hour_consumtion.toFloat();
-		
-//		System.println(hour_consumtion);
-		
-		if (battery_format == 0 || hour_consumtion == -1) {
+		if (battery_format == 0 || !(Sys.getSystemStats() has :batteryInDays)) {
 			// show percent
 			return Lang.format("BAT $1$%",[Math.round(value).format("%d")]);
 		} else {
-			// System.println("" + value + " " + last_hour_consumtion);
-			if (hour_consumtion == 0) {
-				return Lang.format("$1$ DAYS",[99]);
-			}
-			var hour_left = value/(hour_consumtion*1.0);
-			var day_left = hour_left/(24.0); 
+			var day_left = Sys.getSystemStats().batteryInDays;
 			return Lang.format("$1$ DAYS",[day_left.format("%0.1f")]);
 		}
 	}
@@ -1690,3 +1775,31 @@ function _retrieveHeartrate() {
 // end HR stage //
 //////////////////
 
+//////////////
+// Recovery Time //
+//////////////
+
+class RecoveryField extends BaseDataField {
+
+	function initialize(id) {
+		BaseDataField.initialize(id);
+	}
+	
+	function cur_val() {
+		var activityInfo = ActivityMonitor.getInfo();
+		var value = activityInfo.timeToRecovery;
+		return value;
+	}
+	
+	function cur_label(value) {
+		var hours = value;
+		if (hours<=0) {
+			return "Recovered";
+		}
+		return Lang.format("Recov $1$h",[hours.format("%i")]);
+	}
+}
+
+//////////////////
+// end Recovery Time //
+//////////////////
