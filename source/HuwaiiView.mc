@@ -151,6 +151,7 @@ class HuwaiiView extends WatchUi.WatchFace {
         // everything on every update
         if (Application.getApp().getProperty("power_save_mode")
                 && screenbuffer != null) {
+			System.println("Using screen buffer");
             var current_minute = clockTime.min;
             // if minute has changed, draw to the buffer
             if (current_minute!=last_draw_minute) {

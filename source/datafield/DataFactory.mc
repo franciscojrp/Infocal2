@@ -1643,8 +1643,12 @@ class StepField extends BaseDataField {
 				return Lang.format("STEP $1$",[currentStep.format("%d")]);
 			}
 		} else {
-	    	var valKp = App.getApp().toKValue(currentStep);
-	    	return Lang.format("STEP $1$K",[valKp]);
+			if (currentStep > 999) {
+				var valKp = App.getApp().toKValue(currentStep);
+	    		return Lang.format("STEP $1$K",[valKp]);
+			} else {
+				return Lang.format("STEP $1$",[currentStep.format("%d")]);
+			}
     	}
 	}
 
