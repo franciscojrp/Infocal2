@@ -3,6 +3,7 @@ using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 using Toybox.Application as App;
 using Toybox.Time.Gregorian as Date;
+using Toybox.ActivityMonitor;
 
 enum /* FIELD_TYPES */ {
 	FIELD_TYPE_HEART_RATE = 0,
@@ -38,7 +39,8 @@ enum /* FIELD_TYPES */ {
 	FIELD_TYPE_AMPM_INDICATOR = 26,
 	FIELD_TYPE_CTEXT_INDICATOR,
 	FIELD_TYPE_WIND,
-	FIELD_TYPE_RECOVERY
+	FIELD_TYPE_RECOVERY,
+	FIELD_TYPE_PRECIPITATION
 }
 
 function buildFieldObject(type) {
@@ -102,6 +104,8 @@ function buildFieldObject(type) {
 		return new WindField(FIELD_TYPE_WIND);
 	} else if (type==FIELD_TYPE_RECOVERY) {
 		return new RecoveryField(FIELD_TYPE_RECOVERY);
+	} else if (type==FIELD_TYPE_PRECIPITATION) {
+		return new PrecipitationsField(FIELD_TYPE_PRECIPITATION);
 	}
 	
 	return new EmptyDataField(FIELD_TYPE_EMPTY);
@@ -190,20 +194,24 @@ class WindField extends BaseDataField {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
 		var settings = Sys.getDeviceSettings();
-		var speed = Weather.getCurrentConditions().windSpeed;
-		var direct = Weather.getCurrentConditions().windBearing;
-		
-		var direct_corrected = direct + 11.25;                                 					// move degrees to int spaces (North from 348.75-11.25 to 360(min)-22.5(max))
-		direct_corrected = direct_corrected < 360 ? direct_corrected : direct_corrected - 360;  // move North from 360-371.25 back to 0-11.25 (final result is North 0(min)-22.5(max))
-		var direct_idx = (direct_corrected / 22.5).toNumber();                         			// now calculate direction array position: int([0-359.99]/22.5) will result in 0-15 (correct array positions)
-		
-		var directLabel = wind_direction_mapper[direct_idx];
-		var unit = "k";
-		if (settings.distanceUnits == System.UNIT_STATUTE) {	
-			speed *= 0.621371;
-			unit = "m";		
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			var speed = conditions.windSpeed;
+			var direct = conditions.windBearing;
+			
+			var direct_corrected = direct + 11.25;                                 					// move degrees to int spaces (North from 348.75-11.25 to 360(min)-22.5(max))
+			direct_corrected = direct_corrected < 360 ? direct_corrected : direct_corrected - 360;  // move North from 360-371.25 back to 0-11.25 (final result is North 0(min)-22.5(max))
+			var direct_idx = (direct_corrected / 22.5).toNumber();                         			// now calculate direction array position: int([0-359.99]/22.5) will result in 0-15 (correct array positions)
+			
+			var directLabel = wind_direction_mapper[direct_idx];
+			var unit = "mps";
+			if (settings.distanceUnits != System.UNIT_STATUTE) {	
+				speed *= 3.6;
+				unit = "kmh";		
+			}
+			return directLabel + " " + speed.format("%0.0f") + unit;
 		}
-		return directLabel + " " + speed.format("%0.1f") + unit;
+		return "WIND ?";
 	}
 }
 
@@ -261,137 +269,132 @@ class WeatherField extends BaseDataField {
 	}
 	
 	function cur_icon() {
-		var condition = Weather.getCurrentConditions().condition;
-		if (condition == Weather.CONDITION_CLEAR) {
-			return "";
-		} else if (condition == Weather.CONDITION_PARTLY_CLOUDY) {
-			return "";
-		} else if (condition == Weather.CONDITION_MOSTLY_CLOUDY) {
-			return "";
-		} else if (condition == Weather.CONDITION_THIN_CLOUDS) {
-			return "";
-		} else if (condition == Weather.CONDITION_RAIN) {
-			return "";
-		} else if (condition == Weather.CONDITION_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_WINDY) {
-			return "";//TODO
-		} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
-			return "";
-		} else if (condition == Weather.CONDITION_WINTRY_MIX) {
-			return "";//TODO
-		} else if (condition == Weather.CONDITION_FOG) {
-			return "";
-		} else if (condition == Weather.CONDITION_HAZY) {
-			return "";
-		} else if (condition == Weather.CONDITION_HAIL) { //Granizo
-			return "";
-		} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
-			return "";
-		} else if (condition == Weather.CONDITION_SCATTERED_THUNDERSTORMS) {
-			return "";
-		} else if (condition == Weather.CONDITION_UNKNOWN_PRECIPITATION) {
-			return "";
-		} else if (condition == Weather.CONDITION_LIGHT_RAIN) {
-			return "";
-		} else if (condition == Weather.CONDITION_HEAVY_RAIN) {
-			return "";
-		} else if (condition == Weather.CONDITION_LIGHT_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_CLOUDY) {
-			return "";
-		} else if (condition == Weather.CONDITION_RAIN_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
-			return "";
-		} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
-			return "";
-		} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
-			return "";
-		} else if (condition == Weather.CONDITION_SHOWERS) {
-			return "";
-		} else if (condition == Weather.CONDITION_HEAVY_SHOWERS) {
-			return "";
-		} else if (condition == Weather.CONDITION_CHANCE_OF_SHOWERS) {
-			return "";
-		} else if (condition == Weather.CONDITION_CHANCE_OF_THUNDERSTORMS) {
-			return "";
-		} else if (condition == Weather.CONDITION_MIST) {
-			return "";
-		} else if (condition == Weather.CONDITION_FAIR) {
-			return "";
-		} else if (condition == Weather.CONDITION_HURRICANE) {
-			return "";//TODO
-		} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
-			return "";
-		} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
-			return "";
-		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
-			return "";
-			
-		} else if (condition == Weather.CONDITION_DUST) {
-			return "";
-		} else if (condition == Weather.CONDITION_DRIZZLE) {
-			return "";
-		} else if (condition == Weather.CONDITION_TORNADO) {
-			return "";
-		} else if (condition == Weather.CONDITION_SMOKE) {
-			return "";
-		} else if (condition == Weather.CONDITION_ICE) {
-			return "";
-		} else if (condition == Weather.CONDITION_SAND) {
-			return "";
-		} else if (condition == Weather.CONDITION_SQUALL) {
-			return "";
-		} else if (condition == Weather.CONDITION_SANDSTORM) {
-			return "";
-		} else if (condition == Weather.CONDITION_VOLCANIC_ASH) {
-			return "";
-		} else if (condition == Weather.CONDITION_HAZE) {
-			return "";
-		} else if (condition == Weather.CONDITION_FLURRIES) {
-			return "";
-		} else if (condition == Weather.CONDITION_FREEZING_RAIN) {
-			return "";
-		} else if (condition == Weather.CONDITION_SLEET) {
-			return "";
-		} else if (condition == Weather.CONDITION_ICE_SNOW) {
-			return "";
-		} else if (condition == Weather.CONDITION_UNKNOWN) {
-			return "";
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			var condition = conditions.condition;
+			if (condition == Weather.CONDITION_CLEAR) {
+				return "";
+			} else if (condition == Weather.CONDITION_PARTLY_CLOUDY) {
+				return "";
+			} else if (condition == Weather.CONDITION_MOSTLY_CLOUDY) {
+				return "";
+			} else if (condition == Weather.CONDITION_THIN_CLOUDS) {
+				return "";
+			} else if (condition == Weather.CONDITION_RAIN) {
+				return "";
+			} else if (condition == Weather.CONDITION_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_WINDY) {
+				return "";//TODO
+			} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
+				return "";
+			} else if (condition == Weather.CONDITION_WINTRY_MIX) {
+				return "";//TODO
+			} else if (condition == Weather.CONDITION_FOG) {
+				return "";
+			} else if (condition == Weather.CONDITION_HAZY) {
+				return "";
+			} else if (condition == Weather.CONDITION_HAIL) { //Granizo
+				return "";
+			} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
+				return "";
+			} else if (condition == Weather.CONDITION_SCATTERED_THUNDERSTORMS) {
+				return "";
+			} else if (condition == Weather.CONDITION_UNKNOWN_PRECIPITATION) {
+				return "";
+			} else if (condition == Weather.CONDITION_LIGHT_RAIN) {
+				return "";
+			} else if (condition == Weather.CONDITION_HEAVY_RAIN) {
+				return "";
+			} else if (condition == Weather.CONDITION_LIGHT_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_CLOUDY) {
+				return "";
+			} else if (condition == Weather.CONDITION_RAIN_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
+				return "";
+			} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
+				return "";
+			} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
+				return "";
+			} else if (condition == Weather.CONDITION_SHOWERS) {
+				return "";
+			} else if (condition == Weather.CONDITION_HEAVY_SHOWERS) {
+				return "";
+			} else if (condition == Weather.CONDITION_CHANCE_OF_SHOWERS) {
+				return "";
+			} else if (condition == Weather.CONDITION_CHANCE_OF_THUNDERSTORMS) {
+				return "";
+			} else if (condition == Weather.CONDITION_MIST) {
+				return "";
+			} else if (condition == Weather.CONDITION_FAIR) {
+				return "";
+			} else if (condition == Weather.CONDITION_HURRICANE) {
+				return "";//TODO
+			} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
+				return "";
+			} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
+				return "";
+			} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
+				return "";
+				
+			} else if (condition == Weather.CONDITION_DUST) {
+				return "";
+			} else if (condition == Weather.CONDITION_DRIZZLE) {
+				return "";
+			} else if (condition == Weather.CONDITION_TORNADO) {
+				return "";
+			} else if (condition == Weather.CONDITION_SMOKE) {
+				return "";
+			} else if (condition == Weather.CONDITION_ICE) {
+				return "";
+			} else if (condition == Weather.CONDITION_SAND) {
+				return "";
+			} else if (condition == Weather.CONDITION_SQUALL) {
+				return "";
+			} else if (condition == Weather.CONDITION_SANDSTORM) {
+				return "";
+			} else if (condition == Weather.CONDITION_VOLCANIC_ASH) {
+				return "";
+			} else if (condition == Weather.CONDITION_HAZE) {
+				return "";
+			} else if (condition == Weather.CONDITION_FLURRIES) {
+				return "";
+			} else if (condition == Weather.CONDITION_FREEZING_RAIN) {
+				return "";
+			} else if (condition == Weather.CONDITION_SLEET) {
+				return "";
+			} else if (condition == Weather.CONDITION_ICE_SNOW) {
+				return "";
+			} else if (condition == Weather.CONDITION_UNKNOWN) {
+				return "";
+			}
 		}
 		return "";
 	}
 	
 	function cur_label(value) {
-		// WEATHER
-		// var need_minimal = App.getApp().getProperty("minimal_data");
-
-		// var settings = Sys.getDeviceSettings();
-		// var temp = Weather.getCurrentConditions().feelsLikeTemperature;
-		// var unit = "°C";
-		// if (settings.temperatureUnits == System.UNIT_STATUTE) {
-		// 	temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-		// 	unit = "°F";
-		// }
-		// value = temp.format("%d") + unit;
-	
-		var description = get_weather_desc(Weather.getCurrentConditions().condition);
-		if (description != null) {
-			return description;// + " " +  value;
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			var description = get_weather_desc(conditions.condition);
+			if (description != null) {
+				return description;
+			}
 		}
+		return "Unknown";
 	}
 
 	function get_weather_desc(condition) {
@@ -543,19 +546,23 @@ class TemparatureHLField extends BaseDataField {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
 		var settings = Sys.getDeviceSettings();
-		var temp_min = Weather.getCurrentConditions().lowTemperature;
-		var temp_max = Weather.getCurrentConditions().highTemperature;
-		var unit = "°C";
-		if (settings.temperatureUnits == System.UNIT_STATUTE) {
-			temp_min = (temp_min * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-			temp_max = (temp_max * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-			unit = "°F";
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			var temp_min = conditions.lowTemperature;
+			var temp_max = conditions.highTemperature;
+			var unit = "°C";
+			if (settings.temperatureUnits == System.UNIT_STATUTE) {
+				temp_min = (temp_min * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+				temp_max = (temp_max * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+				unit = "°F";
+			}
+			if (need_minimal) {
+				return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
+			} else {
+				return Lang.format("H $1$° - L $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
+			}
 		}
-		if (need_minimal) {
-			return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
-		} else {
-			return Lang.format("H $1$° - L $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
-		}
+		return "H ? - L ?";
 	}
 }
 
@@ -573,19 +580,23 @@ class TemparatureOutField extends BaseDataField {
 		// WEATHER
 		var need_minimal = App.getApp().getProperty("minimal_data");
 		var settings = Sys.getDeviceSettings();
-		var temp = Weather.getCurrentConditions().temperature;
-		var unit = "°C";
-		if (settings.temperatureUnits == System.UNIT_STATUTE) {
-			temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
-			unit = "°F";
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			var temp = conditions.temperature;
+			var unit = "°C";
+			if (settings.temperatureUnits == System.UNIT_STATUTE) {
+				temp = (temp * (9.0 / 5)) + 32; // Convert to Farenheit: ensure floating point division.
+				unit = "°F";
+			}
+			value = temp.format("%d") + unit;
+			
+			if (need_minimal) {
+				return value;
+			} else {
+				return Lang.format("TEMP $1$",[value]);
+			}
 		}
-		value = temp.format("%d") + unit;
-		
-		if (need_minimal) {
-			return value;
-		} else {
-			return Lang.format("TEMP $1$",[value]);
-		}
+		return "TEMP ?";
 	}
 }
 
@@ -1789,8 +1800,11 @@ class RecoveryField extends BaseDataField {
 	
 	function cur_val() {
 		var activityInfo = ActivityMonitor.getInfo();
-		var value = activityInfo.timeToRecovery;
-		return value;
+		if (activityInfo has :timeToRecovery) {
+			var value = activityInfo.timeToRecovery;
+			return value;
+		} 
+		return 0;
 	}
 	
 	function cur_label(value) {
@@ -1804,4 +1818,34 @@ class RecoveryField extends BaseDataField {
 
 //////////////////
 // end Recovery Time //
+//////////////////
+
+//////////////
+// Precipitation chance
+//////////////
+
+class PrecipitationsField extends BaseDataField {
+
+	function initialize(id) {
+		BaseDataField.initialize(id);
+	}
+	
+	function cur_val() {
+		var conditions = Weather.getCurrentConditions();
+		if (conditions != null) {
+			return conditions.precipitationChance;
+		}
+		return -1;
+	}
+	
+	function cur_label(value) {
+		if (value<=0) {
+			return "RAIN ?";
+		}
+		return Lang.format("RAIN $1$%",[value.format("%i")]);
+	}
+}
+
+//////////////////
+// end Precipitation chance 
 //////////////////

@@ -1,5 +1,5 @@
 <strings>
-    <string id="AppName">FenixByFran</string>
+    <string id="AppName">Infocal 2</string>
     <string id="power_save_mode">Reduce refresh rate to 1 per minute to save power</string>
     <string id="white_background">Use white background</string>
     <string id="comp12h">12h angle complication</string>
@@ -80,6 +80,7 @@
     <string id="ctext">Custom text</string>
     <string id="wind">Wind (Kmph or Mph)</string>
     <string id="recover_time">Recovery time (hours)</string>
+    <string id="precipitation_chance">Precipitation chance</string>
     
     <string id="date_format">Date format</string>
     <string id="datef1">ddd d (TUE 2)</string>
