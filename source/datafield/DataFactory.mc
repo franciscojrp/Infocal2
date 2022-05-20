@@ -412,12 +412,12 @@ class WeatherField extends BaseDataField {
 		} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
 			return "Thunderst.";
 		} else if (condition == Weather.CONDITION_WINTRY_MIX) {
-			return "Rain/Snow";
+			return "Rain-Snow";
 		} else if (condition == Weather.CONDITION_FOG) {
 			return "Fog";
 		} else if (condition == Weather.CONDITION_HAZY) {
 			return "Hazy";
-		} else if (condition == Weather.CONDITION_HAIL) { //Granizo
+		} else if (condition == Weather.CONDITION_HAIL) {
 			return "Hail";
 		} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
 			return "Showers";
@@ -434,17 +434,17 @@ class WeatherField extends BaseDataField {
 		} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
 			return "Heavy Snow";
 		} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
-			return "Rain/Snow";
+			return "Rain-Snow";
 		} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
-			return "Rain/Snow";
+			return "Rain-Snow";
 		} else if (condition == Weather.CONDITION_CLOUDY) {
 			return "Cloudy";
 		} else if (condition == Weather.CONDITION_RAIN_SNOW) {
-			return "Rain/Snow";
+			return "Rain-Snow";
 		} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
-			return "Part Clear";
+			return "Part. Clear";
 		} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
-			return "Most Clear";
+			return "Most. Clear";
 		} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
 			return "Showers";
 		} else if (condition == Weather.CONDITION_SHOWERS) {
@@ -462,17 +462,17 @@ class WeatherField extends BaseDataField {
 		} else if (condition == Weather.CONDITION_HURRICANE) {
 			return "Hurricane";
 		} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
-			return "Tr. Storm";
+			return "Trop. Storm";
 		} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
 			return "Snow";
 		} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
-			return "RainSnow";
+			return "Rain-Snow";
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
-			return "Cloud/Rain";
+			return "Clouds-Rain";
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
-			return "Cloud/Snow";
+			return "Clouds-Snow";
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
-			return "Cloud/Snow";
+			return "Clouds-Snow";
 		} else if (condition == Weather.CONDITION_DUST) {
 			return "Dust";
 		} else if (condition == Weather.CONDITION_DRIZZLE) {
@@ -1056,17 +1056,19 @@ class SunField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
+		var position = null;
 		var location = Position.getInfo();
-		if (location has :position && location.position != null && location.accuracy != Position.QUALITY_NOT_AVAILABLE) {
+		if (location != null && location.position != null && location.accuracy != Position.QUALITY_NOT_AVAILABLE) {
 			//Sys.println("Saving location with accuracy " + location.accuracy);
+			position = location.position;
 			var loc = location.position.toDegrees(); // Array of Doubles.
-			//Sys.println("location: " + loc);
 			gLocationLat = loc[0].toFloat();
 			gLocationLng = loc[1].toFloat();
-
+			//Sys.println("location: " + gLocationLat + ", " + gLocationLng);
 			Application.getApp().setProperty("LastLocationLat", gLocationLat);
 			Application.getApp().setProperty("LastLocationLng", gLocationLng);
 		} else {
+			location = null;
 			var lat = Application.getApp().getProperty("LastLocationLat");
 			if (lat != null) {
 				gLocationLat = lat;
@@ -1079,29 +1081,25 @@ class SunField extends BaseDataField {
 
 			if (lat != null && lng != null) {
 				//Sys.println("Using last location: " + gLocationLat + "," + gLocationLng);
-				location = new Position.Location(
+				position = new Position.Location(
 				{
 					:latitude => gLocationLat,
 					:longitude => gLocationLng,
 					:format => :degrees
 				});
 			} else {
-				Sys.println("No location available");
-				location = null;
+				//Sys.println("No location available");
 			}
 		}
 
-		if (location != null) {
+		if (position != null) {
 			value = "";
 			var nextSunEvent = 0;
 			var isSunriseNext = false;
 			var now = Time.now();
-			//Sys.println("location: " + location.position.toGeoString(Position.GEO_DM));
-			var sunrise = Weather.getSunrise(location.position, now);
-			//Sys.println("sunrise: " + sunrise);
-
-			var sunset = Weather.getSunset(location.position, now);
-			//Sys.println("sunset: " + sunset);
+			//Sys.println("location: " + position.toGeoString(Position.GEO_DM));
+			var sunrise = Weather.getSunrise(position, now);
+			var sunset = Weather.getSunset(position, now);
 	
 			// If sunrise/sunset happens today.
 			var sunriseSunsetToday = ((sunrise != null) && (sunset != null));
@@ -1645,9 +1643,9 @@ class StepField extends BaseDataField {
 		} else {
 			if (currentStep > 999) {
 				var valKp = App.getApp().toKValue(currentStep);
-	    		return Lang.format("STEP $1$K",[valKp]);
+	    		return Lang.format("STEPS $1$K",[valKp]);
 			} else {
-				return Lang.format("STEP $1$",[currentStep.format("%d")]);
+				return Lang.format("STEPS $1$",[currentStep.format("%d")]);
 			}
     	}
 	}
@@ -1698,7 +1696,7 @@ class BatteryField extends BaseDataField {
 			return Lang.format("BAT $1$%",[Math.round(value).format("%d")]);
 		} else {
 			var day_left = Sys.getSystemStats().batteryInDays;
-			return Lang.format("$1$ DAYS",[day_left.format("%0.1f")]);
+			return Lang.format("$1$ DAYS",[day_left.format("%d")]);
 		}
 	}
 	
@@ -1800,7 +1798,7 @@ class RecoveryField extends BaseDataField {
 		if (hours<=0) {
 			return "Recovered";
 		}
-		return Lang.format("Recov $1$h",[hours.format("%i")]);
+		return Lang.format("Rec $1$h",[hours.format("%i")]);
 	}
 }
 
