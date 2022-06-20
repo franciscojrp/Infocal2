@@ -1067,19 +1067,20 @@ class SunField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
-		var position = null;
-		var location = Position.getInfo();
-		if (location != null && location.position != null && location.accuracy != Position.QUALITY_NOT_AVAILABLE) {
+		var position = Weather.getCurrentConditions().observationLocationPosition;
+		//var location = Position.getInfo();
+		//if (location != null && location.position != null && location.accuracy != Position.QUALITY_NOT_AVAILABLE) {
+		if (position != null) {
 			//Sys.println("Saving location with accuracy " + location.accuracy);
-			position = location.position;
-			var loc = location.position.toDegrees(); // Array of Doubles.
+			//position = location.position;
+			var loc = position.toDegrees(); // Array of Doubles.
 			gLocationLat = loc[0].toFloat();
 			gLocationLng = loc[1].toFloat();
 			//Sys.println("location: " + gLocationLat + ", " + gLocationLng);
 			Application.getApp().setProperty("LastLocationLat", gLocationLat);
 			Application.getApp().setProperty("LastLocationLng", gLocationLng);
 		} else {
-			location = null;
+			//location = null;
 			var lat = Application.getApp().getProperty("LastLocationLat");
 			if (lat != null) {
 				gLocationLat = lat;
@@ -1129,7 +1130,7 @@ class SunField extends BaseDataField {
 	
 				// After sunset today: tomorrow's sunrise (if any) is next.
 				} else {
-					nextSunEvent = Weather.getSunrise(location.position, Time.today().add(new Time.Duration(86401)));
+					nextSunEvent = Weather.getSunrise(position, Time.today().add(new Time.Duration(86401)));
 					isSunriseNext = true;
 				}
 			}
