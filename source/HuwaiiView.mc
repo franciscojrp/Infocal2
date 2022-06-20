@@ -75,7 +75,7 @@ class HuwaiiView extends WatchUi.WatchFace {
             // create a buffer to draw to 
             // so it can be pasted straight to
             // the screen instead of redrawing
-            System.println("device has clearbufferbug");
+            //System.println("device has clearbufferbug");
             if (Toybox.Graphics has :BufferedBitmap) {
                 screenbuffer = new Graphics.BufferedBitmap(
                         {:width=>dc.getWidth(),
@@ -89,7 +89,7 @@ class HuwaiiView extends WatchUi.WatchFace {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
-    	 var clockTime = System.getClockTime(); 
+    	//var clockTime = System.getClockTime(); 
 
     	last_draw_minute = -1;
     	restore_from_resume = true;

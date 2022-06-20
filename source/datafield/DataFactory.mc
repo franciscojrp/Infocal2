@@ -1810,9 +1810,9 @@ class RecoveryField extends BaseDataField {
 	function cur_label(value) {
 		var hours = value;
 		if (hours<=0) {
-			return "Recovered";
+			return "RECOVERED";
 		}
-		return Lang.format("Rec $1$h",[hours.format("%i")]);
+		return Lang.format("REC $1$h",[hours.format("%i")]);
 	}
 }
 
@@ -1839,7 +1839,7 @@ class PrecipitationsField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
-		if (value<=0) {
+		if (value < 0) {
 			return "RAIN -";
 		}
 		return Lang.format("RAIN $1$%",[value.format("%i")]);

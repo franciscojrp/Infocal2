@@ -53,10 +53,9 @@ class BarDataComplication extends BarComplication {
 		if (position==0) {
 			// upper
         	return Application.getApp().getProperty("compbart");
-        } else if (position==1) {
-        	// lower
-        	return Application.getApp().getProperty("compbarb");
-        }
+        } // else if (position==1) {
+		// lower
+		return Application.getApp().getProperty("compbarb");
 	}
 
 	function draw(dc) {
