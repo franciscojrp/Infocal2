@@ -157,6 +157,7 @@
     <string id="recovered">RECOVERED</string>
 
     <string id="clear">Clear</string>
+    <string id="cloudy">Cloudy</string>
     <string id="part_cloudy">Part. Cloudy</string>
     <string id="most_cloudy">Most. Cloudy</string>
     <string id="thin_clouds">Thin Clouds</string>
