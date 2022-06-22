@@ -13,7 +13,7 @@
     <property id="minimal_data" type="boolean">false</property>
     <property id="big_num_stripes" type="boolean">true</property>
     <property id="left_digital_info" type="boolean">true</property>
-    <property id="force_date_english" type="boolean">true</property>
+    <property id="force_date_english" type="boolean">false</property>
     <property id="big_number_type" type="number">0</property>
 
     <property id="ticks_style" type="number">1</property>

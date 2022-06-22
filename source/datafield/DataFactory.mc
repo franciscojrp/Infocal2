@@ -394,120 +394,120 @@ class WeatherField extends BaseDataField {
 				return description;
 			}
 		}
-		return "Unknown";
+		return Application.loadResource(Rez.Strings.unknown);
 	}
 
 	function get_weather_desc(condition) {
 		if (condition == Weather.CONDITION_CLEAR) {
-			return "Clear";
+			return Application.loadResource(Rez.Strings.clear);
 		} else if (condition == Weather.CONDITION_PARTLY_CLOUDY) {
-			return "Part. Cloudy";
+			return Application.loadResource(Rez.Strings.part_cloudy);
 		} else if (condition == Weather.CONDITION_MOSTLY_CLOUDY) {
-			return "Most. Cloudy";
+			return Application.loadResource(Rez.Strings.most_cloudy);
 		} else if (condition == Weather.CONDITION_THIN_CLOUDS) {
-			return "Thin Clouds";
+			return Application.loadResource(Rez.Strings.thin_clouds);
 		} else if (condition == Weather.CONDITION_RAIN) {
-			return "Rain";
+			return Application.loadResource(Rez.Strings.rain);
 		} else if (condition == Weather.CONDITION_SNOW) {
-			return "Snow";
+			return Application.loadResource(Rez.Strings.snow);
 		} else if (condition == Weather.CONDITION_WINDY) {
-			return "Windy";
+			return Application.loadResource(Rez.Strings.windy);
 		} else if (condition == Weather.CONDITION_THUNDERSTORMS) {
-			return "Thunderst.";
+			return Application.loadResource(Rez.Strings.thunderstom);
 		} else if (condition == Weather.CONDITION_WINTRY_MIX) {
-			return "Rain-Snow";
+			return Application.loadResource(Rez.Strings.rain_snow);
 		} else if (condition == Weather.CONDITION_FOG) {
-			return "Fog";
+			return Application.loadResource(Rez.Strings.fog);
 		} else if (condition == Weather.CONDITION_HAZY) {
-			return "Hazy";
+			return Application.loadResource(Rez.Strings.hazy);
 		} else if (condition == Weather.CONDITION_HAIL) {
-			return "Hail";
+			return Application.loadResource(Rez.Strings.hail);
 		} else if (condition == Weather.CONDITION_SCATTERED_SHOWERS) {
-			return "Showers";
+			return Application.loadResource(Rez.Strings.showers);
 		} else if (condition == Weather.CONDITION_SCATTERED_THUNDERSTORMS) {
-			return "Thunderst.";
+			return Application.loadResource(Rez.Strings.thunderstom);
 		} else if (condition == Weather.CONDITION_UNKNOWN_PRECIPITATION) {
-			return "Precipit.";
+			return Application.loadResource(Rez.Strings.precipitations);
 		} else if (condition == Weather.CONDITION_LIGHT_RAIN) {
-			return "Light Rain";
+			return Application.loadResource(Rez.Strings.light_rain);
 		} else if (condition == Weather.CONDITION_HEAVY_RAIN) {
-			return "Heavy Rain";
+			return Application.loadResource(Rez.Strings.heavy_rain);
 		} else if (condition == Weather.CONDITION_LIGHT_SNOW) {
-			return "Light Snow";
+			return Application.loadResource(Rez.Strings.light_snow);
 		} else if (condition == Weather.CONDITION_HEAVY_SNOW) {
-			return "Heavy Snow";
+			return Application.loadResource(Rez.Strings.heavy_snow);
 		} else if (condition == Weather.CONDITION_LIGHT_RAIN_SNOW) {
-			return "Rain-Snow";
+			return Application.loadResource(Rez.Strings.rain_snow);
 		} else if (condition == Weather.CONDITION_HEAVY_RAIN_SNOW) {
-			return "Rain-Snow";
+			return Application.loadResource(Rez.Strings.rain_snow);
 		} else if (condition == Weather.CONDITION_CLOUDY) {
-			return "Cloudy";
+			return Application.loadResource(Rez.Strings.cloudy);
 		} else if (condition == Weather.CONDITION_RAIN_SNOW) {
-			return "Rain-Snow";
+			return Application.loadResource(Rez.Strings.rain_snow);
 		} else if (condition == Weather.CONDITION_PARTLY_CLEAR) {
-			return "Part. Clear";
+			return Application.loadResource(Rez.Strings.part_clear);
 		} else if (condition == Weather.CONDITION_MOSTLY_CLEAR) {
-			return "Most. Clear";
+			return Application.loadResource(Rez.Strings.most_clear);
 		} else if (condition == Weather.CONDITION_LIGHT_SHOWERS) {
-			return "Showers";
+			return Application.loadResource(Rez.Strings.showers);
 		} else if (condition == Weather.CONDITION_SHOWERS) {
-			return "Showers";
+			return Application.loadResource(Rez.Strings.showers);
 		} else if (condition == Weather.CONDITION_HEAVY_SHOWERS) {
-			return "Showers";
+			return Application.loadResource(Rez.Strings.showers);
 		} else if (condition == Weather.CONDITION_CHANCE_OF_SHOWERS) {
-			return "Showers";
+			return Application.loadResource(Rez.Strings.showers);
 		} else if (condition == Weather.CONDITION_CHANCE_OF_THUNDERSTORMS) {
-			return "Thunderst.";
+			return Application.loadResource(Rez.Strings.thunderstom);
 		} else if (condition == Weather.CONDITION_MIST) {
-			return "Mist";
+			return Application.loadResource(Rez.Strings.mist);
 		} else if (condition == Weather.CONDITION_FAIR) {
-			return "Fair";
+			return Application.loadResource(Rez.Strings.fair);
 		} else if (condition == Weather.CONDITION_HURRICANE) {
-			return "Hurricane";
+			return Application.loadResource(Rez.Strings.hurricane);
 		} else if (condition == Weather.CONDITION_TROPICAL_STORM) {
-			return "Trop. Storm";
+			return Application.loadResource(Rez.Strings.trop_storm);
 		} else if (condition == Weather.CONDITION_CHANCE_OF_SNOW) {
-			return "Snow";
+			return Application.loadResource(Rez.Strings.snow);
 		} else if (condition == Weather.CONDITION_CHANCE_OF_RAIN_SNOW) {
-			return "Rain-Snow";
+			return Application.loadResource(Rez.Strings.rain_snow);
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN) {
-			return "Clouds-Rain";
+			return Application.loadResource(Rez.Strings.clouds_rain);
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_SNOW) {
-			return "Clouds-Snow";
+			return Application.loadResource(Rez.Strings.clouds_snow);
 		} else if (condition == Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN_SNOW) {
-			return "Clouds-Snow";
+			return Application.loadResource(Rez.Strings.clouds_snow);
 		} else if (condition == Weather.CONDITION_DUST) {
-			return "Dust";
+			return Application.loadResource(Rez.Strings.dust);
 		} else if (condition == Weather.CONDITION_DRIZZLE) {
-			return "Drizzle";
+			return Application.loadResource(Rez.Strings.drizzle);
 		} else if (condition == Weather.CONDITION_TORNADO) {
-			return "Tornado";
+			return Application.loadResource(Rez.Strings.tornado);
 		} else if (condition == Weather.CONDITION_SMOKE) {
-			return "Smoke";
+			return Application.loadResource(Rez.Strings.smoke);
 		} else if (condition == Weather.CONDITION_ICE) {
-			return "Ice";
+			return Application.loadResource(Rez.Strings.ice);
 		} else if (condition == Weather.CONDITION_SAND) {
-			return "Sand";
+			return Application.loadResource(Rez.Strings.sand);
 		} else if (condition == Weather.CONDITION_SQUALL) {
-			return "Squall";
+			return Application.loadResource(Rez.Strings.squall);
 		} else if (condition == Weather.CONDITION_SANDSTORM) {
-			return "Sandstorm";
+			return Application.loadResource(Rez.Strings.sandstorm);
 		} else if (condition == Weather.CONDITION_VOLCANIC_ASH) {
-			return "Volc. Ash";
+			return Application.loadResource(Rez.Strings.volc_ash);
 		} else if (condition == Weather.CONDITION_HAZE) {
-			return "Haze";
+			return Application.loadResource(Rez.Strings.haze);
 		} else if (condition == Weather.CONDITION_FLURRIES) {
-			return "Flurries";
+			return Application.loadResource(Rez.Strings.flurries);
 		} else if (condition == Weather.CONDITION_FREEZING_RAIN) {
-			return "Freez. Rain";
+			return Application.loadResource(Rez.Strings.freez_rain);
 		} else if (condition == Weather.CONDITION_SLEET) {
-			return "Sleet";
+			return Application.loadResource(Rez.Strings.sleet);
 		} else if (condition == Weather.CONDITION_ICE_SNOW) {
-			return "Ice Snow";
+			return Application.loadResource(Rez.Strings.ice_snow);
 		} else if (condition == Weather.CONDITION_UNKNOWN) {
-			return "Unknown";
+			return Application.loadResource(Rez.Strings.unknown);
 		}
-		return "Unknown";
+		return Application.loadResource(Rez.Strings.unknown);
 	}
 }
 
@@ -559,10 +559,10 @@ class TemparatureHLField extends BaseDataField {
 			if (need_minimal) {
 				return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
 			} else {
-				return Lang.format("H $1$° - L $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
+				return Lang.format("TEMP $1$°-$2$°",[temp_max.format("%d"), temp_min.format("%d")]);
 			}
 		}
-		return "H - L -";
+		return "TEMP ---";
 	}
 }
 
@@ -1041,10 +1041,11 @@ class FloorField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
+		var floor = Application.loadResource(Rez.Strings.floor);
 		if (value==null) {
-			return "FLOOR --";
+			return floor + " --";
 		}
-	   	return Lang.format("FLOOR $1$",[value.format("%d")]);
+	   	return Lang.format(floor + " $1$",[value.format("%d")]);
 	}
 	
 	function bar_data() {
@@ -1152,9 +1153,12 @@ class SunField extends BaseDataField {
 //				var timestr = ftime[:hour] + ":" + ftime[:min] + ftime[:amPm]; 
 				var timestr = ftime[:hour] + ":" + ftime[:min]; 
 				
-				var riseicon = isSunriseNext ? "RISE" : "SET";
+				var rise = Application.loadResource(Rez.Strings.rise);
+				var set = Application.loadResource(Rez.Strings.set);
+
+				var riseicon = isSunriseNext ? rise : set;
 				if (need_minimal) {
-					riseicon = isSunriseNext ? "RI" : "SE";
+					riseicon = isSunriseNext ? rise.substring(0, 2) : set.substring(0, 2);
 				}
 				return Lang.format("$1$ $2$", [riseicon, timestr]);
 			}
@@ -1607,7 +1611,7 @@ class MoveField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
-    	return Lang.format("MOVE $1$",[value.format("%d")]);
+    	return Lang.format("MOV. $1$",[value.format("%d")]);
 	}
 	
 	function bar_data() {
@@ -1646,18 +1650,19 @@ class StepField extends BaseDataField {
 	function cur_label(value) {
 		var need_minimal = App.getApp().getProperty("minimal_data");
 		var currentStep = value;
+		var steps = Application.loadResource(Rez.Strings.steps);
 		if (need_minimal) {
 			if (currentStep > 999) {
 				return currentStep.format("%d");
 			} else {
-				return Lang.format("STEP $1$",[currentStep.format("%d")]);
+				return Lang.format(steps.substring(0, 4) + " $1$",[currentStep.format("%d")]);
 			}
 		} else {
 			if (currentStep > 999) {
 				var valKp = App.getApp().toKValue(currentStep);
-	    		return Lang.format("STEPS $1$K",[valKp]);
+	    		return Lang.format(steps + " $1$K",[valKp]);
 			} else {
-				return Lang.format("STEPS $1$",[currentStep.format("%d")]);
+				return Lang.format(steps + " $1$",[currentStep.format("%d")]);
 			}
     	}
 	}
@@ -1708,7 +1713,13 @@ class BatteryField extends BaseDataField {
 			return Lang.format("BAT $1$%",[Math.round(value).format("%d")]);
 		} else {
 			var day_left = Sys.getSystemStats().batteryInDays;
-			return Lang.format("$1$ DAYS",[day_left.format("%d")]);
+			var day = Application.loadResource(Rez.Strings.day);
+			var days = Application.loadResource(Rez.Strings.days);
+			if (day_left > 1) {
+				return Lang.format("$1$ " + days,[day_left.format("%d")]);
+			} else {
+				return Lang.format("$1$ " + day,[day_left.format("%d")]);
+			}
 		}
 	}
 	
@@ -1754,10 +1765,11 @@ class HRField extends BaseDataField {
 	
 	function cur_label(value) {
 		var heartRate = value;
+		var hr = Application.loadResource(Rez.Strings.hr);		
 		if (heartRate<=1) {
-			return "HR --";
+			return hr + " --";
 		}
-		return Lang.format("HR $1$",[heartRate.format("%d")]);
+		return Lang.format(hr + " $1$",[heartRate.format("%d")]);
 	}
 	
 	function bar_data() {
@@ -1811,7 +1823,7 @@ class RecoveryField extends BaseDataField {
 	function cur_label(value) {
 		var hours = value;
 		if (hours<=0) {
-			return "RECOVERED";
+			return Application.loadResource(Rez.Strings.recovered);
 		}
 		return Lang.format("REC $1$h",[hours.format("%i")]);
 	}
@@ -1840,10 +1852,11 @@ class PrecipitationsField extends BaseDataField {
 	}
 	
 	function cur_label(value) {
+		var rain = Application.loadResource(Rez.Strings.rain);
 		if (value < 0) {
-			return "RAIN -";
+			return rain + " -";
 		}
-		return Lang.format("RAIN $1$%",[value.format("%i")]);
+		return Lang.format(rain + " $1$%",[value.format("%i")]);
 	}
 }
 
