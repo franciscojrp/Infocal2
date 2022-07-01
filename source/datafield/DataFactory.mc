@@ -559,10 +559,10 @@ class TemparatureHLField extends BaseDataField {
 			if (need_minimal) {
 				return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
 			} else {
-				return Lang.format("TEMP $1$°-$2$°",[temp_max.format("%d"), temp_min.format("%d")]);
+				return Lang.format("A $1$° B $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
 			}
 		}
-		return "TEMP ---";
+		return "TEMPS --";
 	}
 }
 
@@ -593,10 +593,10 @@ class TemparatureOutField extends BaseDataField {
 			if (need_minimal) {
 				return value;
 			} else {
-				return Lang.format("TEMP $1$",[value]);
+				return Lang.format("TEMP. $1$",[value]);
 			}
 		}
-		return "TEMP -";
+		return "TEMP. --";
 	}
 }
 
@@ -1237,20 +1237,20 @@ class TemparatureField extends BaseDataField {
 				if (need_minimal) {
 					return value;
 				} else {
-					return Lang.format("TEMP $1$",[value]);
+					return Lang.format("TEMP. $1$",[value]);
 				}
 			} else {
 				if (need_minimal) {
 					return "--";
 				} else {
-					return "TEMP --";
+					return "TEMP. --";
 				}
 			}
 		} else {
 			if (need_minimal) {
 					return "--";
 				} else {
-					return "TEMP --";
+					return "TEMP. --";
 				}
 		}
 	}

@@ -222,13 +222,16 @@ class HuwaiiApp extends Application.AppBase {
 		var date_formater = Application.getApp().getProperty("date_format");
 		if (date_formater == 0) {
 			if (Application.getApp().getProperty("force_date_english")) {
-				var day_of_weak = date.day_of_week;
-				return Lang.format("$1$ $2$",[days[day_of_weak], date.day.format("%d")]);
+				var day_of_week = date.day_of_week;
+				return Lang.format("$1$ $2$",[days[day_of_week], date.day.format("%d")]);
 			} else {
 				date = Date.info(now, Time.FORMAT_LONG);
 				var day_of_week = date.day_of_week;
 				if (day_of_week.equals("Mié")) {
 					day_of_week = "Mie";
+				}
+				if (day_of_week.equals("Sáb")) {
+					day_of_week = "Sab";
 				}
 				return Lang.format("$1$ $2$",[day_of_week.toUpper(), date.day.format("%d")]);
 			}
