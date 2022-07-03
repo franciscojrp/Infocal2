@@ -154,7 +154,10 @@
     <string id="day">DAY</string>
     <string id="days">DAYS</string>
     <string id="hr">HR</string>
+    <string id="temp_high">H</string>
+    <string id="temp_low">L</string>
     <string id="recovered">RECOVERED</string>
+    <string id="week">WEEK</string>
 
     <string id="clear">Clear</string>
     <string id="cloudy">Cloudy</string>

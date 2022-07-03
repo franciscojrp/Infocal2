@@ -211,7 +211,8 @@ class WindField extends BaseDataField {
 			}
 			return directLabel + " " + speed.format("%0.0f") + unit;
 		}
-		return "WIND -";
+		var wind = Application.loadResource(Rez.Strings.wind);
+		return wind.toUpper() + " -";
 	}
 }
 
@@ -559,10 +560,12 @@ class TemparatureHLField extends BaseDataField {
 			if (need_minimal) {
 				return Lang.format("$1$ $2$",[temp_max.format("%d"), temp_min.format("%d")]);
 			} else {
-				return Lang.format("A $1$° B $2$°",[temp_max.format("%d"), temp_min.format("%d")]);
+				var tmp_h = Application.loadResource(Rez.Strings.temp_high);
+				var tmp_l = Application.loadResource(Rez.Strings.temp_low);
+				return Lang.format("$1$ $2$° $3$ $4$°",[tmp_h, temp_max.format("%d"), tmp_l, temp_min.format("%d")]);
 			}
 		}
-		return "TEMPS --";
+		return "TEMP. --";
 	}
 }
 
@@ -660,7 +663,8 @@ class WeekCountField extends BaseDataField {
 	function cur_label(value) {
 		var date = Date.info(Time.now(), Time.FORMAT_SHORT);
 		var week_num = iso_week_number(date.year, date.month, date.day);
-		return Lang.format("WEEK $1$",[week_num]);
+		var week = Application.loadResource(Rez.Strings.week);
+		return Lang.format("$1$ $2$",[week, week_num]);
 	}
 
 }
@@ -683,10 +687,13 @@ class CountdownField extends BaseDataField {
 		var set_end_date = new Time.Moment(App.getApp().getProperty("countdown_date"));
 	    var now_d = new Time.Moment(Time.today().value());
 	    var dif_e_n = -(now_d.compare(set_end_date))/86400;
+		var day = Application.loadResource(Rez.Strings.day);
+		var days = Application.loadResource(Rez.Strings.days);
+
 	    if (dif_e_n>1 || dif_e_n<-1) {
-	    	return Lang.format("$1$ days",[dif_e_n.toString()]);
+	    	return Lang.format("$1$ $2$",[dif_e_n.toString(), days]);
 	    } else {
-	    	return Lang.format("$1$ day",[dif_e_n.toString()]);
+	    	return Lang.format("$1$ $2$",[dif_e_n.toString(), day]);
 	    }
 	}
 }
@@ -968,7 +975,7 @@ class PhoneField extends BaseDataField {
 	function cur_label(value) {
 		var settings = Sys.getDeviceSettings();
 		if (settings.phoneConnected) {
-			return "CONN";
+			return "CON.";
 		} else {
 			return "--";
 		}
